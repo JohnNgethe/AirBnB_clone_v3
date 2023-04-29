@@ -1,42 +1,28 @@
 #!/usr/bin/python3
 """
-    This script starts a Flask web application
+starts a Flask web application
 """
+
 from flask import Flask, render_template
-from models import storage, State
+from models import *
+from models import storage
 app = Flask(__name__)
 
 
+@app.route('/states', strict_slashes=False)
+@app.route('/states/<state_id>', strict_slashes=False)
+def states(state_id=None):
+    """display the states and cities listed in alphabetical order"""
+    states = storage.all("State")
+    if state_id is not None:
+        state_id = 'State.' + state_id
+    return render_template('9-states.html', states=states, state_id=state_id)
+
+
 @app.teardown_appcontext
-def shutdown_session(exception=None):
-    """
-        Automatically remove session at end of request or
-        app shutdown
-    """
+def teardown_db(exception):
+    """closes the storage on teardown"""
     storage.close()
 
-
-@app.route('/states', strict_slashes=False)
-def display_states():
-    """
-        display html jinja format of state name and id
-    """
-    all_objs = storage.all(State).values()
-    return render_template('7-states_list.html', all_objs=all_objs)
-
-
-@app.route('/states/<id>', strict_slashes=False)
-def display_states_by_id(id):
-    """
-        display jinja format of state if correct id is provided
-    """
-    all_objs = []
-    for obj in storage.all(State).values():
-        if obj.id == id:
-            all_objs.append(obj)
-
-    return render_template('9-states.html', id=id, all_objs=all_objs)
-
-
-if __name__ == "__main__":
-    app.run('0.0.0.0', 5000)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port='5000')

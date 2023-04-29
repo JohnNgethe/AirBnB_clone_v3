@@ -1,31 +1,27 @@
 #!/usr/bin/python3
 """
-    This script starts a flask application
+starts a Flask web application
 """
+
 from flask import Flask, render_template
-from models import storage, State, City, Amenity
+from models import *
+from models import storage
 app = Flask(__name__)
 
 
+@app.route('/hbnb_filters', strict_slashes=False)
+def filters():
+    """display a HTML page like 6-index.html from static"""
+    states = storage.all("State").values()
+    amenities = storage.all("Amenity").values()
+    return render_template('10-hbnb_filters.html', states=states,
+                           amenities=amenities)
+
+
 @app.teardown_appcontext
-def shutdown_session(exception=None):
-    """
-        Automatically remove session at end of request or
-        app shutdown
-    """
+def teardown_db(exception):
+    """closes the storage on teardown"""
     storage.close()
 
-
-@app.route('/hbnb_filters', strict_slashes=False)
-def display_states_filters():
-    """
-        displays html page
-    """
-    states = storage.all(State).values()
-    amenities = storage.all(Amenity).values()
-    return render_template('10-hbnb_filters.html', states=states,
-                            amenities=amenities)
-
-
-if __name__ == "__main__":
-    app.run('0.0.0.0', 5000)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port='5000')

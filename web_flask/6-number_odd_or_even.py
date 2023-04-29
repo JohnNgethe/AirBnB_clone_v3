@@ -1,81 +1,58 @@
 #!/usr/bin/python3
 """
-    This script starts a Flask web application:
-
-    Routes:
-        /: display “Hello HBNB!”
-        /hbnb: display “HBNB”
-        /c/<text>: display “C ”, followed by the value of the text variable
-        (replace underscore _ symbols with a space )
-        /python/(<text>): display “Python ”, followed by the value of the
-        text variable (replace underscore _ symbols with a space )
-        The default value of text is “is cool”
-        /number/<n>: display “n is a number” only if n is an integer
-        /number_template/<n>: display a HTML page only if n is an integer:
-            H1 tag: “Number: n” inside the tag BODY
-        /number_odd_or_even/<n>: display a HTML page only if n is an integer:
-            H1 tag: “Number: n is even|odd” inside the tag BODY
+starts a Flask web application
 """
+
 from flask import Flask, render_template
 app = Flask(__name__)
 
 
 @app.route('/', strict_slashes=False)
-def display1():
-    """ returns Hello HBNB to screen when requested """
+def index():
+    """returns Hello HBNB!"""
     return 'Hello HBNB!'
 
 
 @app.route('/hbnb', strict_slashes=False)
-def display2():
-    """ returns HBNB to screen """
+def hbnb():
+    """returns HBNB"""
     return 'HBNB'
 
 
 @app.route('/c/<text>', strict_slashes=False)
-def display3(text):
-    """ returns C then text string to screen """
-    text = text.replace("_", " ")
-    return 'C {}'.format(text)
+def cisfun(text):
+    """display “C ” followed by the value of the text variable"""
+    return 'C ' + text.replace('_', ' ')
 
 
-# to set a default variable
-@app.route('/python', defaults={'text': 'is cool'}, strict_slashes=False)
+@app.route('/python', strict_slashes=False)
 @app.route('/python/<text>', strict_slashes=False)
-def display4(text):
-    """
-        displays python then text string to screen
-        on request
-    """
-    text = text.replace("_", " ")
-    return 'Python {}'.format(text)
+def pythoniscool(text='is cool'):
+    """display “Python ”, followed by the value of the text variable"""
+    return 'Python ' + text.replace('_', ' ')
 
 
-# to set a specific datatype (int) for integer
 @app.route('/number/<int:n>', strict_slashes=False)
-def display5(n):
-    """
-        Displays n is a number on if n is an integer
-    """
-    return '{} is a number'.format(n)
+def imanumber(n):
+    """display “n is a number” only if n is an integer"""
+    return "{:d} is a number".format(n)
 
 
 @app.route('/number_template/<int:n>', strict_slashes=False)
-def template_display1(n):
-    """
-        Displays template if n is an integer
-    """
+def numbersandtemplates(n):
+    """display a HTML page only if n is an integer"""
     return render_template('5-number.html', n=n)
 
 
 @app.route('/number_odd_or_even/<int:n>', strict_slashes=False)
-def even_or_odd_template(n):
-    """
-        Displays template if n is an integer and based on if n
-        is even or odd
-    """
-    return render_template('6-number_odd_or_even.html', n=n)
+def numbersandevenness(n):
+    """display a HTML page only if n is an integer"""
+    if n % 2 == 0:
+        evenness = 'even'
+    else:
+        evenness = 'odd'
+    return render_template('6-number_odd_or_even.html', n=n,
+                           evenness=evenness)
 
-
-if __name__ == "__main__":
-    app.run('0.0.0.0', 5000)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port='5000')
